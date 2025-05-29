@@ -1,0 +1,51 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Install required packages for LAMP
+  apt:
+    name:
+      - apache2
+      - mysql-server
+      - php
+      - libapache2-mod-php
+      - php-mcrypt
+      - php-mysql
+      - python3-pymysql
+    state: present
+  become: true
+
+- name: Set ServerName in apache2.conf
+  lineinfile:
+    path: /etc/apache2/apache2.conf
+    line: "ServerName {{ server_name }}"
+    state: present
+  notify: Restart Apache
+  become: true
+
+- name: Ensure MySQL is running
+  service:
+    name: mysql
+    state: started
+    enabled: yes
+  become: true
+
+- name: Secure MySQL Installation
+  shell: |
+    mysql -e "DELETE FROM mysql.user WHERE User='';"
+    mysql -e "DROP DATABASE IF EXISTS test;"
+    mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+    mysql -e "FLUSH PRIVILEGES;"
+  ignore_errors: true
+  become: true
+
+- name: Check Apache status
+  shell: systemctl is-active apache2
+  register: apache_status
+  become: true
+
+- name: Show Apache Status
+  debug:
+    msg: "Apache Status: {{ apache_status.stdout }}"
