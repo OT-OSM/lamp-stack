@@ -1,0 +1,54 @@
+---
+- name: Install required packages
+  yum:
+    name:
+      - httpd
+      - mariadb-server
+      - php
+      - php-mysql
+      - php-mcrypt
+    state: present
+
+- name: Start and enable Apache
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: Set ServerName in httpd.conf
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    line: "ServerName {{ server_name }}"
+    state: present
+
+- name: Start and enable MariaDB
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+
+- name: Secure MariaDB (basic)
+  shell: |
+    mysql -e "DELETE FROM mysql.user WHERE User='';"
+    mysql -e "DROP DATABASE IF EXISTS test;"
+    mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+    mysql -e "FLUSH PRIVILEGES;"
+  ignore_errors: true
+
+- name: Set MariaDB root password
+  mysql_user:
+    name: root
+    host: localhost
+    password: "{{ mysql_root_password }}"
+    check_implicit_admin: yes
+
+- name: Restart Apache
+  meta: flush_handlers
+
+- name: Check Apache status
+  shell: systemctl is-active httpd
+  register: apache_status
+
+- name: Show Apache Status
+  debug:
+    msg: "Apache Status: {{ apache_status.stdout }}"
