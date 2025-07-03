@@ -1,3 +1,9 @@
 ---
-- name: Include OS-specific tasks
-  include_tasks: "{{ ansible_facts['os_family'] | lower }}.yml"
+- name: Include Apache installation
+  ansible.builtin.include_tasks: apache.yml
+
+- name: Include MySQL installation
+  ansible.builtin.include_tasks: mysql.yml
+
+- name: Include PHP installation
+  ansible.builtin.include_tasks: php.yml
