@@ -1,2 +1,12 @@
 ---
-server_name: "13.232.150.22"
+apache_packages:
+  - apache2
+
+mysql_packages:
+  - mysql-server
+
+php_packages:
+  - php
+
+apache_service: apache2
+mysql_service: mysql
