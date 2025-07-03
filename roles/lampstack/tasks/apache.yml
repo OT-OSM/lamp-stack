@@ -1,0 +1,17 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install Apache packages
+  ansible.builtin.apt:
+    name: "{{ apache_packages }}"
+    state: present
+
+- name: Ensure Apache is started and enabled
+  ansible.builtin.systemd:
+    name: "{{ apache_service }}"
+    state: started
+    enabled: true
+  notify: restart apache
