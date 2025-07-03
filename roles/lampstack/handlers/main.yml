@@ -1,14 +1,12 @@
 ---
-- name: Restart Apache (Ubuntu)
-  service:
-    name: apache2
+- name: restart apache
+  ansible.builtin.systemd:
+    name: "{{ apache_service }}"
     state: restarted
-  when: ansible_facts['os_family'] == "Debian"
-  become: true
+    enabled: true
 
-- name: Restart Apache (CentOS)
-  service:
-    name: httpd
+- name: restart mysql
+  ansible.builtin.systemd:
+    name: "{{ mysql_service }}"
     state: restarted
-  when: ansible_facts['os_family'] == "RedHat"
-  become: true
+    enabled: true
