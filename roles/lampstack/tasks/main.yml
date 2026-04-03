@@ -1,0 +1,9 @@
+---
+- name: Include Apache installation
+  ansible.builtin.include_tasks: apache.yml
+
+- name: Include MySQL installation
+  ansible.builtin.include_tasks: mysql.yml
+
+- name: Include PHP installation
+  ansible.builtin.include_tasks: php.yml
